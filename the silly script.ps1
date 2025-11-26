@@ -24,7 +24,7 @@ function compress-directory([string]$dir, [string]$output)
     rm $ddfpath
     rm setup.inf
     rm setup.rpt
-} # credit to Jerry Cote on Stack Overflow https://stackoverflow.com/questions/19411440/makecab-create-a-cab-file-from-all-the-files-in-a-folder
+} <# credit to Jerry Cote on Stack Overflow https://stackoverflow.com/questions/19411440/makecab-create-a-cab-file-from-all-the-files-in-a-folder #>
 
 $commands=@(
     'whoami' # List current authenticated user
@@ -37,16 +37,16 @@ $commands=@(
     'Get-Process | Format-List Path' # List all running processes and the full path they are running from
     'Get-Process -IncludeUserName | Select-Object -Property Username, ProcessName' # Enumerate the user that owns the process
     'Get-Process | Select-Object -Property ProcessName, Modules | Format-Table -Wrap -Autosize' # List all loaded modules with running processes
-    '$processes = Get-Process | Select-Object ProcessName;$eater = "";foreach($badname in $processes){$atless = $badname -replace "@{ProcessName=", "";$goodname = $atless -replace "}";if($eater -eq $goodname){$bestname = ""}else{$bestname = "*"+$goodname+"*";$eater = $goodname}get-wmiobject Win32_Service | where-object {$_.PathName -ilike "$bestname"} | Select Name}' # List all Services associated with running processes and yes I'm doing fantastic how are you?
+    '$processes = Get-Process | Select-Object ProcessName;$eater = ""; foreach($badname in $processes){$atless = $badname -replace "@{ProcessName=", ""; $goodname = $atless -replace "}"; if($eater -eq $goodname){$bestname = ""} else{$bestname = "*"+$goodname+"*"; $eater = $goodname} get-wmiobject Win32_Service | where-object {$_.PathName -ilike "$bestname"} | Select Name}' # List all Services associated with running processes and yes I'm doing fantastic how are you?
     'net accounts' # Enumerate the password policies
     'net user' # Enumerate all users
     'Get-LocalGroup' # Enumerate all groups
-    '$groups = Get-LocalGroup | Select-Object Name;foreach($guh in $groups){$gwah = $guh -replace "@{Name=", "";$gwahgwah = $gwah -replace "}", ""; Get-LocalGroupMember -Group $gwahgwah}' # Enumerate all users in each group
+    '$groups = Get-LocalGroup | Select-Object Name; foreach($guh in $groups){$gwah = $guh -replace "@{Name=", ""; $gwahgwah = $gwah -replace "}", ""; Get-LocalGroupMember -Group $gwahgwah}' # Enumerate all users in each group
     'Get-Service' # Enumerate all registered services
     'Get-Service | Where-Object {$_.Status -eq "Running"}' # Enumerate all running services
     'Get-Service | Where-Object {$_.Status -eq "Stopped"}' # Enumerate all stopped services
-    '$services = Get-Service | Select-Object Name;foreach($foo in $services){$bar = $foo -replace "@{Name=", "";$foobar = $bar -replace "}";$barfoo = "*"+$foobar+"*";get-wmiobject Win32_Service | where-object {$_.Name -ilike "$barfoo"} | select Name, PathName | Format-Table -Wrap -Autosize}' # Enumerate the full path of the executable for all registered services (running or stopped)
-    '$ProgFiles = Get-ChildItem -Directory "C:\Program Files" | Select-Object Name;foreach($wee in $ProgFiles){$woo = $wee -replace "@{Name=", "";$weewoo = $woo -replace "}", "";Get-Acl "C:\Program Files\$weewoo"}' # Enumerate the permissions for each folder under Program Files
+    '$services = Get-Service | Select-Object Name; foreach($foo in $services){$bar = $foo -replace "@{Name=", ""; $foobar = $bar -replace "}"; $barfoo = "*"+$foobar+"*"; get-wmiobject Win32_Service | where-object {$_.Name -ilike "$barfoo"} | select Name, PathName | Format-Table -Wrap -Autosize}' # Enumerate the full path of the executable for all registered services (running or stopped)
+    '$ProgFiles = Get-ChildItem -Directory "C:\Program Files" | Select-Object Name; foreach($wee in $ProgFiles){$woo = $wee -replace "@{Name=", ""; $weewoo = $woo -replace "}", ""; Get-Acl "C:\Program Files\$weewoo"}' # Enumerate the permissions for each folder under Program Files
     'Get-Acl C:\Users\Public' # Enumerate the permissions for the folder C:\Users\Public
     'Get-Acl C:\ProgramData' # Enumerate the permissions for the folder C:\ProgramData
     'Get-ScheduledTask' # Enumerate all scheduled tasks
@@ -80,3 +80,4 @@ foreach($i in $commands){
 compress-directory C:\Users\IEUser\Baselines .\Tim_Enumerate.cab
 
 move-item -Path .\Tim_Enumerate.cab -Destination C:\Users\IEUser\Baselines\Tim_Enumerate.cab -Force
+
